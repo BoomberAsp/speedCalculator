@@ -188,12 +188,11 @@ if st.button("开始计算"):
     if results:
         df = pd.DataFrame(results)
         st.subheader("计算结果")
-        st.dataframe(df.style.format({'估算速度（平均）': '{:.2f}'}))
-        st.dataframe(df.style.format({'最大速度': '{:.2f}'}))
+        st.dataframe(df.style.format({'估算速度（平均）': '{:.2f}','最大速度': '{:.2f}'}))
 
 
         # 可视化
-        fig = px.bar(df, x='敌方名称', y='估算速度', color='场次', barmode='group')
+        fig = px.bar(df, x='敌方名称', y='估算速度（平均）', color='场次', barmode='group')
         st.plotly_chart(fig)
     else:
         st.error("无有效计算结果，请检查输入数据")
