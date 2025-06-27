@@ -1,6 +1,41 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import numpy as np
+
+# from framePlat.Algorithm import process_double_images
+
+
+# def align_characters(init_data, current_data):
+#     """ 基于角色位置或名称的匹配算法 """
+#     # 方案一：坐标匹配（适用于UI布局固定的游戏）
+#     matched = []
+#     for i_char in init_data:
+#         min_distance = float('inf')
+#         match = None
+#         for c_char in current_data:
+#             # 计算角色框中心点距离
+#             dist = np.linalg.norm(
+#                 np.array(i_char['position']) - np.array(c_char['position'])
+#             )
+#             if dist < min_distance and dist < 50:  # 50像素阈值
+#                 min_distance = dist
+#                 match = c_char
+#         if match:
+#             matched.append((i_char, match))
+#
+#     # 方案二：名称OCR匹配（备用方案）
+#     if len(matched) != len(init_data):
+#         for i_char in init_data:
+#             for c_char in current_data:
+#                 if i_char['name'] == c_char['name']:
+#                     matched.append((i_char, c_char))
+#
+#     return matched
+#
+
+# def process_double_images(init_img, current_img, battle_idx):
+#     ...
 
 # 全局配置
 DEFAULT_CHARACTERS = 3  # 双方默认角色数
@@ -13,14 +48,49 @@ all_battles = []
 
 for battle_idx in range(num_battles):
     with st.expander(f"第 {battle_idx + 1} 场战斗数据", expanded=True):
+
         # 我方角色数据收集
         st.subheader("我方角色")
+    #     # 双图上传容器
+    #     with st.container(border=True):
+    #         col_init, col_current = st.columns(2)
+    #
+    #         # 初始状态图
+    #         with col_init:
+    #             st.subheader("初始状态截图")
+    #             init_img = st.file_uploader(
+    #                 "上传初始行动值截图",
+    #                 type=["png", "jpg"],
+    #                 key=f"init_img_{battle_idx}",
+    #                 help="应包含角色名称和初始行动值百分比"
+    #             )
+    #             if init_img:
+    #                 st.image(init_img, use_column_width=True)
+    #
+    #         # 当前状态图
+    #         with col_current:
+    #             st.subheader("当前状态截图")
+    #             current_img = st.file_uploader(
+    #                 "上传当前行动值截图",
+    #                 type=["png", "jpg"],
+    #                 key=f"current_img_{battle_idx}",
+    #                 help="应与初始图的角色顺序一致"
+    #             )
+    #             if current_img:
+    #                 st.image(current_img, use_column_width=True)
+    #
+    #     # 识别触发按钮
+    #     if init_img and current_img:
+    #         if st.button("自动识别双图数据", key=f"ocr_double_{battle_idx}"):
+    #             process_double_images(init_img, current_img, battle_idx)
         num_allies = st.number_input(
             "我方角色数量",
             min_value=1,
             value=DEFAULT_CHARACTERS,
             key=f'num_allies_{battle_idx}'
         )
+        # 通过图片导入我方数据
+
 
         allies = []
         for ally_idx in range(num_allies):
@@ -105,10 +175,12 @@ if st.button("开始计算"):
 
             if speeds:
                 avg_speed = sum(speeds) / len(speeds)
+                max_speed = max(speeds)
                 results.append({
                     '场次': battle_idx + 1,
                     '敌方名称': enemy['name'],
-                    '估算速度': avg_speed,
+                    '估算速度（平均）': avg_speed,
+                    '最大速度': max_speed,
                     '参考我方角色数': len(speeds)
                 })
 
@@ -117,6 +189,7 @@ if st.button("开始计算"):
         df = pd.DataFrame(results)
         st.subheader("计算结果")
         st.dataframe(df.style.format({'估算速度': '{:.2f}'}))
+
 
         # 可视化
         fig = px.bar(df, x='敌方名称', y='估算速度', color='场次', barmode='group')
