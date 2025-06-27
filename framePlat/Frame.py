@@ -188,7 +188,8 @@ if st.button("开始计算"):
     if results:
         df = pd.DataFrame(results)
         st.subheader("计算结果")
-        st.dataframe(df.style.format({'估算速度': '{:.2f}'}))
+        st.dataframe(df.style.format({'估算速度（平均）': '{:.2f}'}))
+        st.dataframe(df.style.format({'最大速度': '{:.2f}'}))
 
 
         # 可视化
